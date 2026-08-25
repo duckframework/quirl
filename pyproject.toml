@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quirl"
+dynamic = ["version", "dependencies"]
+description = "A reusable UI component library for Duck Framework's Lively reactive components."
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "AUTHORS.md"]
+authors = [
+    { name = "Brian Musakwa", email = "digreatbrian@gmail.com" },
+]
+maintainers = [
+    { name = "Brian Musakwa", email = "digreatbrian@gmail.com" },
+]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Web Environment",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Software Development :: User Interfaces",
+    "Framework :: Duck Framework",
+]
+keywords = [
+    "duck framework",
+    "duck",
+    "lively",
+    "lively components",
+    "reactive ui",
+    "server-side rendering",
+    "ui components",
+    "component library",
+    "web components",
+    "python ui",
+]
+
+[project.urls]
+Homepage = "https://github.com/duckframework/quirl"
+Documentation = "https://quirl.duckframework.com"
+Source = "https://github.com/duckframework/quirl"
+Issues = "https://github.com/duckframework/quirl/issues"
+
+[tool.setuptools.dynamic]
+version = {attr = "quirl.__version__"}
+dependencies = { file = ["requirements.txt"] }
+
+[tool.setuptools.packages.find]
+include = ["quirl*"]
+where = ["."]

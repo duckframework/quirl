@@ -1,0 +1,7 @@
+include LICENSE
+include AUTHORS.md
+include README.md
+recursive-include quirl *
+exclude quirl/**/__pycache__
+exclude quirl/**/__pycache__/*.pyc
+
