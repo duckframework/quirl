@@ -6,7 +6,10 @@
 Documentation
 ==============
 
-Some info here.
+A reusable UI component library for [Duck Framework](https://duckframework.com)'s Lively reactive system.
+
+Build consistent, themeable interfaces in pure Python — no separate frontend toolchain, no JavaScript bundling, no build steps for your UI logic.
+
 
 Github
 -----------

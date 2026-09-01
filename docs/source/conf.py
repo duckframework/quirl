@@ -433,7 +433,7 @@ exclude_patterns = ["*/projects/*/backend/*", "_build", "Thumbs.db", ".DS_Store"
 
 
 # -- Options for HTML output --
-html_theme = "sphinxawesome_theme"
+html_theme = "furo"
 html_static_path = ["_static"]
 html_css_files = ["css/custom.css"]
 html_title = "Quirl"
