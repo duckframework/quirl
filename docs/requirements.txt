@@ -1,0 +1,15 @@
+astroid==3.3.9
+sphinx>=8.2.3
+myst-parser>=4.0.1
+myst-parser[linkify]>=2.0.3
+sphinx_copybutton>=0.5.2
+sphinx_design>=0.6.1
+sphinx-tabs>=3.4.1
+sphinxcontrib-mermaid>=1.0.0
+sphinxcontrib-napoleon>=0.7
+readthedocs-sphinx-search>=0.3.2
+sphinxawesome-theme>=5.3.2
+sphinx_autodoc_typehints>=3.5.1
+git+https://github.com/digreatbrian/sphinx-multiversion-x.git
+git+https://github.com/digreatbrian/autodocx.git
+git+https://github.com/duckframework/duck.git

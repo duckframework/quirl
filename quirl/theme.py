@@ -7,7 +7,7 @@ instead of hardcoded literals. Tokens are open-ended — add any name/value
 pair, not just the built-in defaults.
 """
 
-from typing import ClassVar
+from typing import ClassVar, Optional
 
 from duck.html.components.style import Style
 
@@ -59,18 +59,32 @@ class Theme(metaclass=ThemeMeta):
     DEFAULTS: ClassVar[dict[str, str]] = {
         "accent_color": "#F5C842",
         "surface_color": "#111318",
+        "surface_elevated_color": "#1C1F26",
         "text_color": "#F5F5F5",
+        "muted_text_color": "rgba(245, 245, 245, 0.6)",
         "border_color": "rgba(255, 255, 255, 0.12)",
+        "success_color": "#30D158",
+        "warning_color": "#FF9F0A",
+        "error_color": "#FF453A",
+        "info_color": "#0A84FF",
         "border_radius": "12px",
-        "font_family": "system-ui",
+        "border_radius_sm": "8px",
+        "font_family": (
+            "-apple-system, BlinkMacSystemFont, 'SF Pro Text', "
+            "'Segoe UI', Roboto, sans-serif"
+        ),
         "font_size": "1rem",
         "spacing": "8px",
+        "shadow_sm": "0 1px 2px rgba(0, 0, 0, 0.24)",
+        "shadow_md": "0 8px 24px rgba(0, 0, 0, 0.28)",
+        "transition_fast": "0.15s cubic-bezier(0.4, 0, 0.2, 1)",
+        "transition_spring": "0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
     }
 
     def __init__(
         self,
         name: str = "default",
-        base: Theme | None = None,
+        base: Optional["Theme"] = None,
         **tokens: str,
     ):
         """
@@ -124,7 +138,7 @@ class Theme(metaclass=ThemeMeta):
         """
         return self.tokens.get(key, default)
 
-    def update(self, **tokens: str) -> Theme:
+    def update(self, **tokens: str) -> "Theme":
         """
         Add new tokens or override existing ones after construction.
 
@@ -137,7 +151,7 @@ class Theme(metaclass=ThemeMeta):
         self.tokens.update(tokens)
         return self
 
-    def extend(self, name: str, **overrides: str) -> Theme:
+    def extend(self, name: str, **overrides: str) -> "Theme":
         """
         Create a new Theme inheriting this theme's tokens.
 

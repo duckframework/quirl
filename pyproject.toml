@@ -53,6 +53,10 @@ Homepage = "https://github.com/duckframework/quirl"
 Documentation = "https://quirl.duckframework.com"
 Source = "https://github.com/duckframework/quirl"
 Issues = "https://github.com/duckframework/quirl/issues"
+Contribution = "https://duckframework.com/contribute?pkg=quirl"
+
+[project.scripts]
+duck = "quirl.__main__:cli"
 
 [tool.setuptools.dynamic]
 version = {attr = "quirl.__version__"}

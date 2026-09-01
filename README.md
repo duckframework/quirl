@@ -94,14 +94,14 @@ from duck.html.components.container import Container
 from duck.html.components.button import Button
 from duck.html.components.input import Input
 
-from quirl.components.animation.demo import Demo
+from quirl.components import Demo
 
 
 # Demo a built-in Button
 button_demo = Demo(
     component=Button(text="Submit", bg_color="blue", color="white"),
     steps=[
-        {"delay": 1000, "cursor": {"top": "45%", "left": "48%"}},
+        {"delay": 1000, "cursor": {"target": "button"}},
         {"delay": 500, "target": "button", "click": True},
         {"delay": 2000},
     ],
