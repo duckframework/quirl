@@ -47,18 +47,16 @@ This guide shows the basic setup for using Quirl in a Duck application.
 
 ```{important} Required: Global Styles
 
-Before using any Quirl component, add "quirl_global_styles()" to your page's "<head>". 
-Quirl components rely on these global styles for their default appearance and behavior.
+Before using any Quirl component, add `quirl_global_styles()` to your page's `<head>`. 
+Quirl components rely on these global styles for their default appearance and behavior.  
+
+This only needs to be added once per page. It is required whenever you use Quirl components.
 ```
 
 ```python
 from quirl.styles import quirl_global_styles
 
 page.add_to_head(quirl_global_styles())
-```
-
-```{important}
-Important: This only needs to be added once per page. It is required whenever you use Quirl components.
 ```
 
 ### 2. Define a Theme

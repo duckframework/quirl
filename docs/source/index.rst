@@ -9,7 +9,7 @@ Documentation
 .. image:: https://cdn.jsdelivr.net/gh/duckframework/quirl@main/images/quirl-wordmark.svg
    :alt: Quirl Wordmark
 
-A reusable UI component library for [Duck Framework's](https://duckframework.com) Lively reactive system.
+A reusable UI component library for`Duck Framework's <https://duckframework.com>`_ Lively reactive system.
 
 Build consistent, themeable interfaces in pure Python — no separate frontend toolchain, no JavaScript bundling, no build steps for your UI logic.
 
