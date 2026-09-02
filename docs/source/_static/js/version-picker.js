@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   versionPicker.style.backgroundColor = "black";
   versionPicker.style.color = "#ffffff";
   versionPicker.style.border = "1px solid #ddd";
-  versionPicker.style.padding = "4.5px";
+  versionPicker.style.padding = "1rem";
   versionPicker.style.borderRadius = "5px";
   versionPicker.style.boxShadow = "0px 2px 5px rgba(0, 0, 0, 0.2)";
   versionPicker.style.zIndex = "1000";

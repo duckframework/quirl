@@ -1,6 +1,11 @@
 # Quirl
 
-![Quirl Wordmark](./images/quirl-wordmark.svg)
+![Quirl Wordmark](https://cdn.jsdelivr.net/gh/duckframework/quirl@main/images/quirl-wordmark.svg)
+
+[![Python >=3.10](https://img.shields.io/badge/python->=3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
+[![License](https://img.shields.io/github/license/duckframework/quirl)](https://github.com/duckframework/quirl/blob/main/LICENSE)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/duckframework/quirl/docs.yml?branch=main)](https://github.com/duckframework/quirl/actions)
+[![10+ Components](https://img.shields.io/badge/10%2B-components-blue)](https://quirl.duckframework.com)
 
 A reusable UI component library for [Duck Framework's](https://duckframework.com) Lively reactive system.
 
@@ -16,6 +21,13 @@ quirl provides a structured foundation for creating and documenting Duck Lively 
 - **Self-documenting** — Components declare their own usage docs via markdown docstrings. A build script turns those into a static gallery.
 - **Animated demos without a server** — Wrap any component in a Demo container to generate pure HTML/CSS/JS showcases. Deploy to GitHub Pages with zero hosting cost.
 - **No inheritance lock-in** — The demo system works with any Duck component, built-in or third-party, without requiring base class changes.
+
+---
+
+## Useful links
+
+- [Quirl Documentation](https://quirl.duckframework.com)
+- [Duck Framework Docs](https://docs.duckframework.com)
 
 ---
 
@@ -156,4 +168,3 @@ The animation demo system lives under `quirl.components.animation.demo` and wrap
 ## License
 
 See [LICENSE](./LICENSE).
-
