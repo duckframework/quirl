@@ -33,7 +33,6 @@ classifiers = [
     "Topic :: Internet :: WWW/HTTP :: Dynamic Content",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: User Interfaces",
-    "Framework :: Duck Framework",
 ]
 keywords = [
     "duck framework",
