@@ -1,6 +1,6 @@
 {
-  "name": "Duck Framework",
-  "short_name": "Duck",
+  "name": "Quirl",
+  "short_name": "Quirl",
   "icons": [
     {
       "src": "/main/static/images/favicon/web-app-manifest-192x192.png",

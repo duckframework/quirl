@@ -1,4 +1,4 @@
-{# Extends Sphinx's default page.html to inject Duck Framework SEO and version picker. #}
+{# Extends Sphinx's default page.html to inject Quirl SEO and version picker. #}
 {% extends "!page.html" %}
 
 {% block extrahead %}
@@ -29,55 +29,63 @@
     <title>{{ title }}</title>
 
     {# Description: ~155 chars, keyword-rich, action-oriented. #}
-    <meta name="description" content="Official Duck Framework docs. Build real-time, reactive web apps in pure Python using WebSockets — no JavaScript required. Full-stack, batteries included."/>
+    <meta name="description" content="Official Quirl docs. Premium HTML components for Duck Framework — themeable, self-documenting, drop-in building blocks for real-time Python UIs."/>
 
     {# Canonical prevents duplicate-content penalties across versioned URLs. #}
-    <link rel="canonical" href="{{ DUCK_DOCS_URL }}"/>
-
+    <link rel="canonical" href="{{ QUIRL_DOCS_URL }}"/>
+    
     <meta name="robots" content="index, follow"/>
 
     {# Keywords ordered by likely search volume / intent. #}
-    <meta name="keywords" content="Duck Framework, Python web framework, full-stack Python, reactive Python, WebSocket Python, no JavaScript web framework, Django alternative, Flask alternative, Python frontend, real-time Python web app"/>
+    <meta name="keywords" content="Quirl, Duck Framework components, Python HTML components, themeable UI components, Python web components, Duck Framework UI kit, no JavaScript components, Python frontend library, reactive Python components"/>
 
     <meta http-equiv="Content-Language" content="en"/>
     <meta name="author" content="Brian Musakwa"/>
 
     {# ── Open Graph ── #}
     {# OG title ~60 chars; description ~155 chars. #}
-    <meta property="og:title" content="Duck Framework · Python Web Framework"/>
-    <meta property="og:description" content="Build real-time, reactive web apps in pure Python. Duck Framework's WebSocket-driven UI engine replaces JavaScript frontends entirely."/>
-    <meta property="og:url" content="{{ DUCK_DOCS_URL }}"/>
+    <meta property="og:title" content="Quirl · Premium Components for Duck Framework"/>
+    <meta property="og:description" content="Themeable, self-documenting HTML components built for Duck Framework. Drop-in UI building blocks for real-time Python web apps."/>
+    <meta property="og:url" content="{{ QUIRL_DOCS_URL }}"/>
     <meta property="og:image" content="{{ pathto('_static/images/og-image.png', 1) }}"/>
     <meta property="og:image:width" content="1200"/>
     <meta property="og:image:height" content="630"/>
-    <meta property="og:image:alt" content="Duck Framework · Python Web Framework Documentation"/>
+    <meta property="og:image:alt" content="Quirl · Premium Components for Duck Framework Documentation"/>
     <meta property="og:type" content="website"/>
-    <meta property="og:site_name" content="Duck Framework Docs"/>
+    <meta property="og:site_name" content="Quirl Docs"/>
     <meta property="og:locale" content="en_US"/>
-
+    
     {# ── Twitter Card ── #}
     <meta name="twitter:card" content="summary_large_image"/>
-    <meta name="twitter:title" content="Duck Framework · Python Web Framework"/>
-    <meta name="twitter:description" content="Build real-time, reactive web apps in pure Python. WebSocket-driven UI — no JavaScript needed."/>
+    <meta name="twitter:title" content="Quirl · Premium Components for Duck Framework"/>
+    <meta name="twitter:description" content="Themeable, self-documenting HTML components for Duck Framework. No JavaScript needed."/>
     <meta name="twitter:image" content="{{ pathto('_static/images/og-image.png', 1) }}"/>
-    <meta name="twitter:image:alt" content="Duck Framework Documentation"/>
+    <meta name="twitter:image:alt" content="Quirl Documentation"/>
     <meta name="twitter:site" content="@duckframework"/>
 
     {# ── Favicons ── #}
     <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-96x96.png', 1) }}" type="image/png" sizes="96x96"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-128x128.png', 1) }}" type="image/png" sizes="128x128"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-152x152.png', 1) }}" type="image/png" sizes="152x152"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-167x167.png', 1) }}" type="image/png" sizes="167x167"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-192x192.png', 1) }}" type="image/png" sizes="192x192"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-256x256.png', 1) }}" type="image/png" sizes="256x256"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-384x384.png', 1) }}" type="image/png" sizes="384x384"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-512x512.png', 1) }}" type="image/png" sizes="512x512"/>
+    <link rel="icon" href="{{ pathto('_static/images/favicon/favicon-1024x1024.png', 1) }}" type="image/png" sizes="1024x1024"/>
     <link rel="icon" href="{{ pathto('_static/images/favicon/favicon.svg', 1) }}" type="image/svg+xml"/>
-    <link rel="shortcut icon" href="{{ pathto('_static/images/favicon/favicon.ico', 1) }}"/>
+    <link rel="shortcut icon" href="{{ pathto('favicon.ico', 1) }}"/>
     <link rel="apple-touch-icon" href="{{ pathto('_static/images/favicon/apple-touch-icon.png', 1) }}" sizes="180x180"/>
-    <link rel="manifest" href="{{ pathto('_static/images/favicon/site.webmanifest', 1) }}"/>
-
+    <link rel="manifest" href="{{ pathto('_static/site.webmanifest', 1) }}"/>
+    
     {# ── Structured Data (JSON-LD) ── #}
-    {# SoftwareApplication schema helps Google surface the framework in rich results. #}
+    {# SoftwareApplication schema helps Google surface the package in rich results. #}
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "Duck Framework",
-      "description": "Build real-time, reactive web apps in pure Python using a WebSocket-driven UI engine — no JavaScript required.",
+      "name": "Quirl",
+      "description": "Themeable, self-documenting HTML components built for Duck Framework — premium UI building blocks for real-time Python web apps.",
       "author": {
         "@type": "Person",
         "name": "Brian Musakwa",
@@ -86,13 +94,13 @@
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Windows, macOS, Linux",
       "programmingLanguage": "Python",
-      "url": "https://duckframework.com",
-      "documentation": "{{ DUCK_DOCS_URL }}",
-      "codeRepository": "https://github.com/duckframework/duck",
+      "url": "https://quirl.duckframework.com",
+      "documentation": "{{ QUIRL_DOCS_URL }}",
+      "codeRepository": "https://github.com/duckframework/quirl",
       "license": "https://opensource.org/license/bsd-3-clause",
       "sameAs": [
-        "https://github.com/duckframework/duck",
-        "https://docs.duckframework.com"
+        "https://github.com/duckframework/quirl",
+        "https://pypi.org/project/quirl/"
       ],
       "image": "{{ pathto('_static/images/og-image.png', 1) }}"
     }
