@@ -151,7 +151,7 @@ status = StatusLabel(
 page.body.add(status)
 ```
 
-## 5. Add Static Component Demos
+### 5. Add Static Component Demos
 
 Quirl also provides `Demo` for creating static component showcases.
 

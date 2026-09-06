@@ -1,5 +1,3 @@
-# Quirl
-
 ![Quirl Wordmark](https://cdn.jsdelivr.net/gh/duckframework/quirl@main/images/quirl-wordmark.svg)
 
 [![Python >=3.10](https://img.shields.io/badge/python->=3.10-blue.svg)](https://www.python.org/downloads/release/python-3100/)
@@ -7,7 +5,7 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/duckframework/quirl/docs.yml?branch=main)](https://github.com/duckframework/quirl/actions)
 [![10+ Components](https://img.shields.io/badge/10%2B-components-blue)](https://quirl.duckframework.com)
 
-A reusable UI component library for [Duck Framework's](https://duckframework.com) Lively reactive system.
+A reusable UI component library for [Duck Framework's](https://duckframework.com) for HTML components & Lively reactive system.
 
 Build consistent, themeable interfaces in pure Python — no separate frontend toolchain, no JavaScript bundling, no build steps for your UI logic.
 
