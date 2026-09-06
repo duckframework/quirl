@@ -6,6 +6,9 @@ properties so any Quirl component can reference var(--theme-<token>)
 instead of hardcoded literals. Tokens are open-ended — add any name/value
 pair, not just the built-in defaults.
 """
+
+from typing import ClassVar, Optional
+
 from duck.html.components.theme import Theme
 
 
