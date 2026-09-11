@@ -35,7 +35,7 @@ quirl provides a structured foundation for creating and documenting Duck Lively 
 pip install quirl
 ```
 
-Requires Python 3.10+ and `duckframework>=2.3.1`.
+Requires Python 3.10+ and `duckframework>=2.3.2`.
 
 ---
 

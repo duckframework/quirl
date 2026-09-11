@@ -30,9 +30,16 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "duck.etc.structures.projects.testing.web
 
 # Entry point to sphinx
 def setup(app):
+    from duck.settings import SETTINGS
+    
     def on_html_page_context(app, template_name, template, context, _):
         context["DUCK_HOMEPAGE"] = DUCK_HOMEPAGE
         context["QUIRL_DOCS_URL"] = QUIRL_DOCS_URL
+    
+    # Disable lively
+    SETTINGS['ENABLE_LIVELY_COMPONENT_SYSTEM'] = False
+    
+    # Connect sphinx hooks
     app.connect("html-page-context", on_html_page_context)
     app.connect("builder-inited", on_builder_inited)
     app.connect("build-finished", on_build_finished)
@@ -76,8 +83,11 @@ def update_components_toctree(srcdir: pathlib.Path) -> None:
 
 def generate_component_pages(srcdir: pathlib.Path) -> list:
     """
-    Render a Documentor(component_cls=X) page for every public component
-    in quirl.components and write it to source/components/<name>.rst.
+    Render a documentation page per entry in quirl.components'
+    component groups — one page per component normally, but a single
+    combined page when a submodule exports several components together
+    (e.g. carousel.py's MarqueeCarousel and SliderCarousel) — and write
+    it to source/components/<page>.rst.
 
     Args:
         srcdir: The Sphinx source root (app.srcdir).
@@ -90,21 +100,36 @@ def generate_component_pages(srcdir: pathlib.Path) -> list:
     
     from quirl.components.documentor import Documentor
     from quirl.styles import quirl_global_styles
-
+    
     components_dir = srcdir / "components"
     components_dir.mkdir(parents=True, exist_ok=True)
-
+    
+    # Initialize some data
     global_styles_html = quirl_global_styles().render()
     entries = []
 
-    for name in quirl.components.__all__:
-        component_cls = getattr(quirl.components, name)
-        doc_html = Documentor(component_cls=component_cls).render()
-        page_html = global_styles_html + doc_html
-
-        page_path = components_dir / f"{name.lower()}.rst"
-        write_component_page(page_path, name, page_html)
-        entries.append(f"components/{name.lower()}")
+    for module_path, names in quirl.components._COMPONENT_GROUPS.items():
+        is_grouped = len(names) > 1
+        page_key = module_path.rsplit(".", 1)[-1] if is_grouped else names[0]
+        title = page_key.replace("_", " ").title() if is_grouped else page_key
+        
+        # Build sections html
+        sections_html = "".join(
+            Documentor(component_cls=getattr(quirl.components, name)).render()
+            for name in names
+        )
+        
+        # Build page html
+        page_html = global_styles_html + sections_html
+        
+        # Build page path
+        page_path = components_dir / f"{page_key.lower()}.rst"
+        
+        # Write component page
+        write_component_page(page_path, title, page_html)
+        
+        # Add entries
+        entries.append(f"components/{page_key.lower()}")
 
     return sorted(entries)
 
