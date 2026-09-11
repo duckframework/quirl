@@ -2,8 +2,8 @@
 Quirl Carousel components — themeable, self-documenting carousels.
 
 Two variants, since their driving logic differs enough to make one
-class awkward: MarqueeCarousel loops continuously via rAF and never
-"snaps" to a slide; SliderCarousel pages discretely and always has an
+class awkward: MarqueeCarousel loops continuously via rAF (optionally
+wrapping seamlessly); SliderCarousel pages discretely and always has an
 exact current index. Both share layout/theme plumbing via CarouselBase.
 """
 from itertools import count
@@ -20,29 +20,30 @@ class CarouselBase(Container):
     Shared layout, theming, and dot-pagination for Quirl carousels.
 
     Not used directly — see MarqueeCarousel and SliderCarousel.
-    
+
     Required Props:
         items (list[Component]): Slide content, one component per slide.
 
     Optional Props:
         gap (str): CSS gap between items. Defaults to the theme's spacing token.
         show_dots (bool): Whether to render position dots. Default True.
+        id (str): Element id. Auto-generated if omitted.
     """
 
     _id_counter = count(1)
 
     def on_create(self) -> None:
         super().on_create()
-        
+
         # Get some kwargs
         self.items = self.get_kwarg_or_raise("items")
         self.gap = self.kwargs.get("gap", Theme.current.spacing)
         self.show_dots = self.kwargs.get("show_dots", True)
-        
+
         # Set ID and class
         self.id = self.kwargs.get("id") or f"q-carousel-{next(self._id_counter)}"
         self.klass = f"{self.klass or ''} q-carousel".strip()
-        
+
         # Update the style
         self.style.update({
             "display": "flex",
@@ -67,11 +68,16 @@ class CarouselBase(Container):
             "gap": self.gap,
             "overflow-x": "auto",
             "scrollbar-width": "none",
+            # Needed so item.offsetLeft (used for active-dot tracking and
+            # loop-offset math) is measured relative to the track itself,
+            # rather than whatever positioned ancestor happens to be further
+            # up the page.
+            "position": "relative",
         }
-        
+
         # Update style
         style.update(extra_style or {})
-        
+
         # Return the final container
         return Container(id=f"{self.id}-track", klass="q-carousel-track", style=style, children=children)
 
@@ -123,21 +129,43 @@ class CarouselBase(Container):
             }}
         """)
 
+    def build_activate_helper(self) -> str:
+        """
+        Returns a small JS snippet that binds both click and keyboard
+        (Enter/Space) activation to an element — needed since dots/arrows
+        use role="button" on plain divs, which browsers don't make
+        keyboard-activatable on their own.
+        """
+        return """
+          function bindActivate(el, handler) {
+            el.addEventListener('click', handler);
+            el.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                e.preventDefault();
+                handler();
+              }
+            });
+          }
+        """
+
 
 class MarqueeCarousel(CarouselBase):
     """
-    Continuously auto-scrolling, seamlessly looping carousel.
+    Continuously auto-scrolling carousel.
 
-    The item list is duplicated once internally so the loop wraps
-    without a visible jump. Dots track the nearest item to the
-    viewport's left edge and can be clicked to jump to that item;
-    auto-scroll pauses on interaction and resumes after a delay.
+    When `loop` is True (the default), the item list is duplicated once
+    internally so the loop wraps without a visible jump. When `loop` is
+    False, no duplicates are created and the marquee scrolls to the end
+    and stops there. Dots track the nearest item to the viewport's left
+    edge and can be clicked (or activated via keyboard) to jump to that
+    item; auto-scroll pauses on interaction and resumes after a delay.
 
     Required Props:
         items (list[Component]): Slide content, one component per slide.
 
     Optional Props:
         speed (float): Pixels scrolled per animation frame. Default 1.2.
+        loop (bool): Seamlessly wrap back to the start. Default True.
         gap (str): CSS gap between items. Defaults to the theme's spacing token.
         show_dots (bool): Whether to render position dots. Default True.
         pause_on_interaction (bool): Pause auto-scroll on pointer/wheel/touch. Default True.
@@ -148,6 +176,10 @@ class MarqueeCarousel(CarouselBase):
     ```python
     MarqueeCarousel(items=[Card(...) for c in collections], speed=1.5)
     ```
+    
+    Notes:
+        The `items` must have `width` set for best results.
+    
     """
 
     docs_preview_kwargs = {
@@ -163,51 +195,61 @@ class MarqueeCarousel(CarouselBase):
 
     def on_create(self) -> None:
         super().on_create()
-        
+
         # Get some kwargs
         self.speed = self.kwargs.get("speed", 1.2)
+        self.loop = self.kwargs.get("loop", True)
         self.pause_on_interaction = self.kwargs.get("pause_on_interaction", True)
         self.resume_delay = self.kwargs.get("resume_delay", 2200)
 
         for i, item in enumerate(self.items):
             item.klass = f"{item.klass or ''} q-carousel-item".strip()
             item.props["data-index"] = str(i)
+            # Without this, items shrink to fit the track instead of
+            # honoring their own width (min-width was the only thing
+            # that "worked" because it sets a floor flex-shrink ignores).
+            item.style.setdefault("flex-shrink", "0")
 
-        # Initialize duplicates
+        # Initialize duplicates (only needed for seamless looping)
         duplicates = []
         
-        for i, item in enumerate(self.items):
-            clone = item.clone() if hasattr(item, "clone") else item
-            clone.props.update({"aria-hidden": "true", "tabindex": "-1"})
-            duplicates.append(clone)
+        if self.loop:
+            for item in self.items:
+                clone = item.copy()
+                clone.props.update({"aria-hidden": "true", "tabindex": "-1"})
+                duplicates.append(clone)
 
         # Build children
         children = [self.build_track(self.items + duplicates)]
-        
+
         if self.show_dots:
             children.append(self.build_dots())
 
         # Add children
         self.add_children(children)
-        
+
         # Add other children
         self.add_children([self.build_dot_style(), self.build_script()])
 
     def build_script(self) -> Script:
         """
         Returns the script driving continuous scroll, active-dot
-        tracking, dot-click navigation, and pause/resume on interaction.
+        tracking, dot-click/keyboard navigation, and pause/resume on
+        interaction.
 
         Returns:
             A Script component with the marquee's runtime behavior.
         """
         return Script(inner_html=f"""
         (function () {{
+          {self.build_activate_helper()}
+
           var track = document.getElementById('{self.id}-track');
           var dotsRow = document.getElementById('{self.id}-dots');
           if (!track) return;
 
           var SPEED = {self.speed};
+          var LOOP = {str(self.loop).lower()};
           var paused = false;
           var resumeTimer = null;
 
@@ -224,9 +266,10 @@ class MarqueeCarousel(CarouselBase):
           }}
 
           var originals = track.querySelectorAll('.q-carousel-item:not([aria-hidden])');
-          var loopOffset = originals.length && track.querySelectorAll('.q-carousel-item')[originals.length]
-            ? track.querySelectorAll('.q-carousel-item')[originals.length].offsetLeft - originals[0].offsetLeft
-            : track.scrollWidth / 2;
+          var allItems = track.querySelectorAll('.q-carousel-item');
+          var loopOffset = LOOP && originals.length && allItems[originals.length]
+            ? allItems[originals.length].offsetLeft - originals[0].offsetLeft
+            : 0;
 
           function updateActiveDot() {{
             if (!dotsRow) return;
@@ -242,7 +285,7 @@ class MarqueeCarousel(CarouselBase):
 
           if (dotsRow) {{
             dotsRow.querySelectorAll('.q-carousel-dot').forEach(function (dot, i) {{
-              dot.addEventListener('click', function () {{
+              bindActivate(dot, function () {{
                 track.scrollTo({{ left: originals[i].offsetLeft, behavior: 'smooth' }});
                 pauseThenResume();
               }});
@@ -250,9 +293,14 @@ class MarqueeCarousel(CarouselBase):
           }}
 
           function tick() {{
-            if (!paused && loopOffset > 0) {{
-              var next = track.scrollLeft + SPEED;
-              track.scrollLeft = next >= loopOffset ? next - loopOffset : next;
+            if (!paused) {{
+              if (LOOP && loopOffset > 0) {{
+                var next = track.scrollLeft + SPEED;
+                track.scrollLeft = next >= loopOffset ? next - loopOffset : next;
+              }} else if (!LOOP) {{
+                var maxScroll = track.scrollWidth - track.clientWidth;
+                track.scrollLeft = Math.min(track.scrollLeft + SPEED, maxScroll);
+              }}
             }}
             updateActiveDot();
             requestAnimationFrame(tick);
@@ -287,6 +335,10 @@ class SliderCarousel(CarouselBase):
     ```python
     SliderCarousel(items=[Slide(...) for s in slides], interval=5000)
     ```
+    
+    Notes:
+        The `items` must have `width` set for best results.
+    
     """
 
     docs_preview_kwargs = {
@@ -302,7 +354,7 @@ class SliderCarousel(CarouselBase):
 
     def on_create(self) -> None:
         super().on_create()
-        
+
         # Get some kwargs
         self.autoplay = self.kwargs.get("autoplay", True)
         self.interval = self.kwargs.get("interval", 4000)
@@ -317,10 +369,10 @@ class SliderCarousel(CarouselBase):
 
         # Build track
         track = self.build_track(self.items, extra_style={"scroll-snap-type": "x mandatory"})
-        
+
         # Initialize row children with the track
         row_children = [track]
-        
+
         if self.show_arrows:
             row_children = [self.build_arrow("prev", "‹"), track, self.build_arrow("next", "›")]
 
@@ -341,7 +393,7 @@ class SliderCarousel(CarouselBase):
 
         # Initial children
         self.add_children(children)
-        
+
         # Add other children
         self.add_children([self.build_dot_style(), self.build_script()])
 
@@ -389,6 +441,8 @@ class SliderCarousel(CarouselBase):
         """
         return Script(inner_html=f"""
         (function () {{
+          {self.build_activate_helper()}
+
           var track = document.getElementById('{self.id}-track');
           var dotsRow = document.getElementById('{self.id}-dots');
           var prevBtn = document.getElementById('{self.id}-arrow-prev');
@@ -420,11 +474,11 @@ class SliderCarousel(CarouselBase):
 
           if (dotsRow) {{
             dotsRow.querySelectorAll('.q-carousel-dot').forEach(function (dot, i) {{
-              dot.addEventListener('click', function () {{ goTo(i); pauseThenResume(); }});
+              bindActivate(dot, function () {{ goTo(i); pauseThenResume(); }});
             }});
           }}
-          if (prevBtn) prevBtn.addEventListener('click', function () {{ goTo(index - 1); pauseThenResume(); }});
-          if (nextBtn) nextBtn.addEventListener('click', function () {{ goTo(index + 1); pauseThenResume(); }});
+          if (prevBtn) bindActivate(prevBtn, function () {{ goTo(index - 1); pauseThenResume(); }});
+          if (nextBtn) bindActivate(nextBtn, function () {{ goTo(index + 1); pauseThenResume(); }});
 
           if ({str(self.pause_on_interaction).lower()}) {{
             ['pointerdown', 'wheel', 'touchstart'].forEach(function (evt) {{
