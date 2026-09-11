@@ -33,7 +33,7 @@ COMPONENT_GROUPS = {
 # Reverse lookup built once: public name -> its submodule
 NAME_TO_MODULE = {
     name: module_path
-    for module_path, names in _COMPONENT_GROUPS.items()
+    for module_path, names in COMPONENT_GROUPS.items()
     for name in names
 }
 
