@@ -108,7 +108,7 @@ def generate_component_pages(srcdir: pathlib.Path) -> list:
     global_styles_html = quirl_global_styles().render()
     entries = []
 
-    for module_path, names in quirl.components._COMPONENT_GROUPS.items():
+    for module_path, names in quirl.components.COMPONENT_GROUPS.items():
         is_grouped = len(names) > 1
         page_key = module_path.rsplit(".", 1)[-1] if is_grouped else names[0]
         title = page_key.replace("_", " ").title() if is_grouped else page_key

@@ -160,6 +160,12 @@ class MarqueeCarousel(CarouselBase):
     edge and can be clicked (or activated via keyboard) to jump to that
     item; auto-scroll pauses on interaction and resumes after a delay.
 
+    A single duplicated set of items may not be wide enough to overflow
+    the track — with few or narrow items, there's simply nothing to
+    scroll. At runtime the script keeps appending extra duplicate sets
+    until the track actually overflows, so looping works regardless of
+    item count or size.
+
     Required Props:
         items (list[Component]): Slide content, one component per slide.
 
@@ -195,7 +201,7 @@ class MarqueeCarousel(CarouselBase):
 
     def on_create(self) -> None:
         super().on_create()
-
+        
         # Get some kwargs
         self.speed = self.kwargs.get("speed", 1.2)
         self.loop = self.kwargs.get("loop", True)
@@ -210,7 +216,9 @@ class MarqueeCarousel(CarouselBase):
             # that "worked" because it sets a floor flex-shrink ignores).
             item.style.setdefault("flex-shrink", "0")
 
-        # Initialize duplicates (only needed for seamless looping)
+        # Initialize duplicates (only needed for seamless looping). This
+        # single extra set is a starting point — the script tops it up
+        # further at runtime if it still isn't enough to overflow.
         duplicates = []
         
         if self.loop:
@@ -267,6 +275,24 @@ class MarqueeCarousel(CarouselBase):
 
           var originals = track.querySelectorAll('.q-carousel-item:not([aria-hidden])');
           var allItems = track.querySelectorAll('.q-carousel-item');
+
+          // One duplicated set can still be narrower than the track
+          // (few or small items), leaving nothing to scroll — the
+          // marquee would look frozen. Keep appending duplicate sets
+          // until the track actually overflows, so looping is reliable
+          // no matter how many items there are or how wide they are.
+          var overflowGuard = 0;
+          while (LOOP && originals.length && track.scrollWidth <= track.clientWidth && overflowGuard < 20) {{
+            originals.forEach(function (el) {{
+              var clone = el.cloneNode(true);
+              clone.setAttribute('aria-hidden', 'true');
+              clone.setAttribute('tabindex', '-1');
+              track.appendChild(clone);
+            }});
+            overflowGuard += 1;
+          }}
+
+          allItems = track.querySelectorAll('.q-carousel-item');
           var loopOffset = LOOP && originals.length && allItems[originals.length]
             ? allItems[originals.length].offsetLeft - originals[0].offsetLeft
             : 0;
