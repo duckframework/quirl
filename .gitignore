@@ -1,5 +1,4 @@
 __pycache__/
 quirl.egg-info/
 dist/
-build/
-
+/build/
