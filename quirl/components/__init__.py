@@ -28,6 +28,7 @@ COMPONENT_GROUPS = {
     "animation.demo": ["Demo"],
     "documentor": ["Documentor"],
     "carousel": ["MarqueeCarousel", "SliderCarousel"],
+    "image": ["SmartImage", "CircularSmartImage", "SmartImagePlaceholder"],
 }
 
 # Reverse lookup built once: public name -> its submodule

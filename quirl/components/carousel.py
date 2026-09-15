@@ -276,22 +276,29 @@ class MarqueeCarousel(CarouselBase):
           var originals = track.querySelectorAll('.q-carousel-item:not([aria-hidden])');
           var allItems = track.querySelectorAll('.q-carousel-item');
 
-          // One duplicated set can still be narrower than the track
-          // (few or small items), leaving nothing to scroll — the
-          // marquee would look frozen. Keep appending duplicate sets
-          // until the track actually overflows, so looping is reliable
-          // no matter how many items there are or how wide they are.
-          var overflowGuard = 0;
-          while (LOOP && originals.length && track.scrollWidth <= track.clientWidth && overflowGuard < 20) {{
-            originals.forEach(function (el) {{
-              var clone = el.cloneNode(true);
-              clone.setAttribute('aria-hidden', 'true');
-              clone.setAttribute('tabindex', '-1');
-              track.appendChild(clone);
-            }});
-            overflowGuard += 1;
-          }}
+          // Compute exactly how many duplicate sets are needed to overflow
+          // the track, instead of capping at a fixed iteration count (which
+          // fails when items are small/few relative to viewport width).
+          if (LOOP && originals.length) {{
+            var setWidth = 0;
+            originals.forEach(function (el) {{ setWidth += el.getBoundingClientRect().width; }});
+            var gapPx = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
+            setWidth += gapPx * originals.length;
 
+            if (setWidth > 0) {{
+              var setsPresent = Math.max(1, Math.round(allItems.length / originals.length));
+              var setsNeeded = Math.ceil((track.clientWidth * 2) / setWidth) + 1;
+              for (var s = setsPresent; s < setsNeeded; s++) {{
+                originals.forEach(function (el) {{
+                  var clone = el.cloneNode(true);
+                  clone.setAttribute('aria-hidden', 'true');
+                  clone.setAttribute('tabindex', '-1');
+                  track.appendChild(clone);
+                }});
+              }}
+            }}
+          }}
+          
           allItems = track.querySelectorAll('.q-carousel-item');
           var loopOffset = LOOP && originals.length && allItems[originals.length]
             ? allItems[originals.length].offsetLeft - originals[0].offsetLeft

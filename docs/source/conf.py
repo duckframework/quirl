@@ -36,9 +36,6 @@ def setup(app):
         context["DUCK_HOMEPAGE"] = DUCK_HOMEPAGE
         context["QUIRL_DOCS_URL"] = QUIRL_DOCS_URL
     
-    # Disable lively
-    SETTINGS["ENABLE_COMPONENT_SYSTEM"] = False
-    
     # Connect sphinx hooks
     app.connect("html-page-context", on_html_page_context)
     app.connect("builder-inited", on_builder_inited)

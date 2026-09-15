@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- Added image module with `SmartImage`, `CircularSmartImage` and `SmartImagePlaceholder`.
 - Added carousel module with `SliderCarousel` and `MarqueeCarousel`.
 
 ### Changed

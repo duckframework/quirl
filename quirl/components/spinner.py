@@ -27,14 +27,14 @@ class Spinner(Container):
 
     Usage:
     ```python
-    Spinner(size="md", color="var(--quirl-accent-color)")
+    Spinner(size="md", color="var(--theme-accent-color)")
     Spinner(variant="dots")
     ```
 
     Optional Props:
     - variant: One of ring, dots. Defaults to ring.
     - size: One of sm, md, lg. Defaults to md.
-    - color: Spinner color, defaults to var(--quirl-accent-color)
+    - color: Spinner color, defaults to var(--theme-accent-color)
     """
 
     docs_preview_kwargs = {
@@ -72,7 +72,7 @@ class Spinner(Container):
             "animation": "quirl-spin 0.8s linear infinite",
         })
 
-        self.props["class"] = "quirl-spinner"
+        self.klass = "quirl-spinner"
 
     def build_dots(self) -> None:
         """
@@ -81,14 +81,17 @@ class Spinner(Container):
         size = self.kwargs.get("size", "md")
         dot_size = {"sm": "5px", "md": "7px", "lg": "9px"}.get(size, "7px")
         color = self.kwargs.get("color", Theme.current.accent_color)
-
+        
+        # Set the class
+        self.klass = "quirl-spinner-dots"
+        
+        # Update style
         self.style.update({
             "display": "inline-flex",
             "align-items": "center",
             "gap": "4px",
         })
-        self.props["class"] = "quirl-spinner-dots"
-
+        
         # Stagger each dot's bounce so they animate in sequence
         for delay in ("0s", "0.15s", "0.3s"):
             self.add_child(Container(
