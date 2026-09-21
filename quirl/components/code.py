@@ -81,7 +81,7 @@ class CodeBlock(BaseCodeBlock):
             
     Usage:
     ```python
-    CodeBlock(code="Button(text='Click me')")
+    CodeBlock(code="Button(text='Click me')", language="python")
     ```
     """
     
@@ -147,7 +147,7 @@ class EditableCodeBlock(BaseEditableCodeBlock):
             
     Usage:
     ```python
-    CodeBlock(code="Button(text='Click me')")
+    CodeBlock(code="Button(text='Click me')", lanuage="python")
     ```
     """
     

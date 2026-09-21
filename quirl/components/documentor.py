@@ -9,7 +9,7 @@ from duck.html.components.paragraph import Paragraph
 
 from quirl.components.animation.demo import Demo
 from quirl.components.badge import Badge
-from quirl.components.code_block import CodeBlock
+from quirl.components.code import CodeBlock
 from quirl.components.divider import Divider
 from quirl.theme import Theme
 
@@ -142,7 +142,9 @@ class Documentor(Container):
         current_prop = None
 
         def flush_current_prop():
-            """Join and store the in-progress prop buffer, if any."""
+            """
+            Join and store the in-progress prop buffer, if any.
+            """
             if current_prop is None:
                 return
 
@@ -367,7 +369,7 @@ class Documentor(Container):
                         "overflow": "hidden",
                         "max-width": "100%",
                     },
-                    children=[CodeBlock(code=usage_code)],
+                    children=[CodeBlock(code=usage_code, language="python")],
                 ),
             ],
         )
