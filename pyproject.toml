@@ -55,7 +55,7 @@ Issues = "https://github.com/duckframework/quirl/issues"
 Contribution = "https://duckframework.com/contribute?pkg=quirl"
 
 [project.scripts]
-duck = "quirl.__main__:cli"
+quirl = "quirl.__main__:cli"
 
 [tool.setuptools.dynamic]
 version = {attr = "quirl.__version__"}

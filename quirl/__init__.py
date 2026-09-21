@@ -1,5 +1,5 @@
 """
-Quirl — a modern, iOS-inspired premium component pack for Duck Framework.
+Quirl — a modern, premium component pack for Duck Framework.
 
 Add the shared keyframes stylesheet once per page so animated components
 work:
