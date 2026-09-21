@@ -48,8 +48,8 @@ class Avatar(Container):
     - alt: Alt text for the image
     - size: One of xs, sm, md, lg, xl. Defaults to md.
     - status: One of online, away, busy, offline. Adds a presence dot.
-    - bg_color: Circle background, defaults to var(--quirl-accent-color)
-    - color: Initials color, defaults to var(--quirl-surface-color)
+    - bg_color: Circle background, defaults to var(--theme-accent-color)
+    - color: Initials color, defaults to var(--theme-surface-color)
     """
 
     docs_preview_kwargs = {

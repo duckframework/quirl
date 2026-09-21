@@ -60,27 +60,48 @@ class SmartImage(Container):
     (e.g. an icon, a Label, a Spinner).
 
     Required Props:
-    - (none — src is optional; placeholder covers the unset case)
-
+        - (none — src is optional; placeholder covers the unset case)
+        
     Optional Props:
-    - source: Image source URL. If omitted, the placeholder shows immediately.
-    - placeholder: Fallback (URL string or component) for both unset src
-      and network error, unless overridden below. If neither this nor
-      unset_placeholder/error_placeholder is given, a plain
-      SmartImagePlaceholder is used instead of showing nothing.
-    - unset_placeholder: Shown when src is empty/None. Overrides placeholder.
-    - error_placeholder: Shown when the image fails to load. Overrides placeholder.
-    - alt: Alt text for the image.
-    - fit: object-fit value, defaults to cover.
-    - height: Container height (CSS value).
-    - width: Container width (CSS value).
-    - circular: Whether to render the image (and placeholder) as a circle.
-    - image_id: Optional id applied to the underlying <img>, so calling code can
-          update `.src` later (e.g. `document.getElementById(image_id).src = url`)
-          and have the placeholder swap react live.
-    - lazy: If True, sets the native `loading="lazy"` attribute so the
-          browser defers fetching until the image nears the viewport. Defaults
-          to False (eager). Only affects the primary image, not placeholders.
+        - source:
+              Image source URL. If omitted, the placeholder shows immediately.
+            
+        - placeholder:
+              Fallback (URL string or component) for both unset src
+              and network error, unless overridden below. If neither this nor
+              unset_placeholder/error_placeholder is given, a plain
+              `SmartImagePlaceholder` is used instead of showing nothing.
+        
+        - unset_placeholder:
+              Shown when src is empty/None. Overrides placeholder.
+        
+        - error_placeholder:
+              Shown when the image fails to load. Overrides placeholder.
+        
+        - alt:
+              Alt text for the image.
+        
+        - fit:
+              object-fit value, defaults to cover.
+        
+        - height:
+              Container height (CSS value).
+        
+        - width:
+              Container width (CSS value).
+        
+        - circular:
+              Whether to render the image (and placeholder) as a circle.
+        
+        - image_id:
+              Optional id applied to the underlying <img>, so calling code can
+              update `.src` later (e.g. `document.getElementById(image_id).src = url`)
+              and have the placeholder swap react live.
+        
+        - lazy:
+              If True, sets the native `loading="lazy"` attribute so the
+              browser defers fetching until the image nears the viewport. Defaults
+              to False (eager). Only affects the primary image, not placeholders.
 
     Usage:
     ```python
@@ -97,7 +118,7 @@ class SmartImage(Container):
             reflected automatically without re-rendering this component.
     """
 
-    docs_preview_kwargs = {"placeholder": "/static/img/placeholder.png"}
+    docs_preview_kwargs = {"source": "/static/img/uknown.png"}
 
     # Shared data attribute used to scope placeholder lookups to this
     # instance's own siblings via `this.parentElement.querySelector(...)`.

@@ -1,6 +1,7 @@
 """
 Assembles complete documentation for any Duck component.
 """
+import re
 
 from duck.html.components.container import Container, FlexContainer
 from duck.html.components.heading import Heading
@@ -11,6 +12,9 @@ from quirl.components.badge import Badge
 from quirl.components.code_block import CodeBlock
 from quirl.components.divider import Divider
 from quirl.theme import Theme
+
+
+TYPE_ANNOTATION_PATTERN = re.compile(r"^(?P<name>[^\s(]+)\s*(?:\((?P<type>[^)]+)\))?$")
 
 
 class Documentor(Container):
@@ -121,6 +125,10 @@ class Documentor(Container):
         """
         Parse Required Props and Optional Props from the docstring.
 
+        Supports typed prop names (e.g. ``key (str): ...``) and
+        multi-line descriptions, where continuation lines are indented
+        under the prop and a blank line separates one prop from the next.
+
         Returns:
             A Container with headings and prop rows for each section
             found in the docstring.
@@ -131,31 +139,59 @@ class Documentor(Container):
         required = []
         optional = []
         section = None
+        current_prop = None
+
+        def flush_current_prop():
+            """Join and store the in-progress prop buffer, if any."""
+            if current_prop is None:
+                return
+
+            prop_text = " ".join(current_prop)
+
+            if section == "required":
+                required.append(prop_text)
+
+            elif section == "optional":
+                optional.append(prop_text)
 
         # Parse prop lines from the docstring
         for line in lines:
             stripped = line.strip()
 
             if stripped == "Required Props:":
+                flush_current_prop()
+                current_prop = None
                 section = "required"
                 continue
 
             elif stripped == "Optional Props:":
+                flush_current_prop()
+                current_prop = None
                 section = "optional"
                 continue
 
             elif stripped.startswith("```") or stripped.startswith("Usage:"):
+                flush_current_prop()
+                current_prop = None
                 section = None
                 continue
 
-            if section and stripped.startswith("-"):
-                prop_text = stripped.lstrip("- ").strip()
+            if not section:
+                continue
 
-                if section == "required":
-                    required.append(prop_text)
+            if stripped.startswith("-"):
+                flush_current_prop()
+                current_prop = [stripped.lstrip("- ").strip()]
 
-                elif section == "optional":
-                    optional.append(prop_text)
+            elif stripped == "":
+                # Blank line: separator only, prop is flushed on next "-"
+                continue
+
+            elif current_prop is not None:
+                # Continuation line for the current prop's description
+                current_prop.append(stripped)
+
+        flush_current_prop()
 
         children = []
 
@@ -209,13 +245,45 @@ class Documentor(Container):
         """
         Build a single prop row with the name emphasized as code.
 
+        Supports an optional type annotation in the name, formatted as
+        `key (type): description`.
+
         Args:
             prop_text: Raw "name: description" text from the docstring.
 
         Returns:
             A Container styled as a row inside a props list.
         """
-        name, _, description = prop_text.partition(":")
+        name_part, _, description = prop_text.partition(":")
+
+        match = TYPE_ANNOTATION_PATTERN.match(name_part.strip())
+        name = match.group("name") if match else name_part.strip()
+        prop_type = match.group("type") if match else None
+
+        name_children = [
+            Paragraph(
+                text=name,
+                style={
+                    "margin": "0",
+                    "font-family": "monospace",
+                    "font-weight": "600",
+                    "color": Theme.current.accent_color,
+                },
+            ),
+        ]
+
+        if prop_type:
+            name_children.append(
+                Paragraph(
+                    text=f"({prop_type})",
+                    style={
+                        "margin": "0",
+                        "font-family": "monospace",
+                        "font-size": "0.85em",
+                        "color": Theme.current.muted_text_color,
+                    },
+                ),
+            )
 
         return Container(
             style={
@@ -227,14 +295,9 @@ class Documentor(Container):
                 "background": Theme.current.surface_elevated_color,
             },
             children=[
-                Paragraph(
-                    text=name.strip(),
-                    style={
-                        "margin": "0",
-                        "font-family": "monospace",
-                        "font-weight": "600",
-                        "color": Theme.current.accent_color,
-                    },
+                Container(
+                    style={"display": "flex", "gap": "6px", "align-items": "baseline"},
+                    children=name_children,
                 ),
                 Paragraph(
                     text=description.strip(),
@@ -247,7 +310,7 @@ class Documentor(Container):
         """
         Build the Usage code block from the same kwargs driving the Demo.
 
-        Sourcing usage from ``docs_preview_kwargs`` (rather than a
+        Sourcing usage from `docs_preview_kwargs` (rather than a
         hand-written docstring snippet) guarantees the code shown here
         always matches what the live preview actually renders. Falls
         back to parsing a ```python block from the docstring only for

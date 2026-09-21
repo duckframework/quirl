@@ -24,7 +24,7 @@ COMPONENT_GROUPS = {
     "tag": ["Tag"],
     "spinner": ["Spinner"],
     "divider": ["Divider"],
-    "code_block": ["CodeBlock"],
+    "code": ["CodeBlock", "EditableCodeBlock"],
     "animation.demo": ["Demo"],
     "documentor": ["Documentor"],
     "carousel": ["MarqueeCarousel", "SliderCarousel"],
