@@ -1,4 +1,4 @@
-name: Build & Deploy Sphinx Multiversion Docs
+name: Build & Deploy Quirl's Sphinx Multiversion Docs
 
 on:
   push:

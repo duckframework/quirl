@@ -30,7 +30,7 @@ class CarouselBase(Container):
         id (str): Element id. Auto-generated if omitted.
     """
 
-    _id_counter = count(1)
+    id_counter = count(1)
 
     def on_create(self) -> None:
         super().on_create()
@@ -41,7 +41,7 @@ class CarouselBase(Container):
         self.show_dots = self.kwargs.get("show_dots", True)
 
         # Set ID and class
-        self.id = self.kwargs.get("id") or f"q-carousel-{next(self._id_counter)}"
+        self.id = self.kwargs.get("id") or f"q-carousel-{next(self.id_counter)}"
         self.klass = f"{self.klass or ''} q-carousel".strip()
 
         # Update the style
@@ -160,11 +160,8 @@ class MarqueeCarousel(CarouselBase):
     edge and can be clicked (or activated via keyboard) to jump to that
     item; auto-scroll pauses on interaction and resumes after a delay.
 
-    A single duplicated set of items may not be wide enough to overflow
-    the track — with few or narrow items, there's simply nothing to
-    scroll. At runtime the script keeps appending extra duplicate sets
-    until the track actually overflows, so looping works regardless of
-    item count or size.
+    Looping needs one set of items at least as wide as the viewport. With
+    fewer or narrower items, the marquee stops at the end instead of wrapping.
 
     Required Props:
         items (list[Component]): Slide content, one component per slide.
@@ -182,10 +179,9 @@ class MarqueeCarousel(CarouselBase):
     ```python
     MarqueeCarousel(items=[Card(...) for c in collections], speed=1.5)
     ```
-    
+
     Notes:
         The `items` must have `width` set for best results.
-    
     """
 
     docs_preview_kwargs = {
@@ -201,7 +197,7 @@ class MarqueeCarousel(CarouselBase):
 
     def on_create(self) -> None:
         super().on_create()
-        
+
         # Get some kwargs
         self.speed = self.kwargs.get("speed", 1.2)
         self.loop = self.kwargs.get("loop", True)
@@ -216,11 +212,10 @@ class MarqueeCarousel(CarouselBase):
             # that "worked" because it sets a floor flex-shrink ignores).
             item.style.setdefault("flex-shrink", "0")
 
-        # Initialize duplicates (only needed for seamless looping). This
-        # single extra set is a starting point — the script tops it up
-        # further at runtime if it still isn't enough to overflow.
+        # Initialize duplicates (only needed for seamless looping). One
+        # duplicate set gives a seamless wrap when the items fill the viewport.
         duplicates = []
-        
+
         if self.loop:
             for item in self.items:
                 clone = item.copy()
@@ -275,31 +270,6 @@ class MarqueeCarousel(CarouselBase):
 
           var originals = track.querySelectorAll('.q-carousel-item:not([aria-hidden])');
           var allItems = track.querySelectorAll('.q-carousel-item');
-
-          // Compute exactly how many duplicate sets are needed to overflow
-          // the track, instead of capping at a fixed iteration count (which
-          // fails when items are small/few relative to viewport width).
-          if (LOOP && originals.length) {{
-            var setWidth = 0;
-            originals.forEach(function (el) {{ setWidth += el.getBoundingClientRect().width; }});
-            var gapPx = parseFloat(getComputedStyle(track).columnGap || getComputedStyle(track).gap) || 0;
-            setWidth += gapPx * originals.length;
-
-            if (setWidth > 0) {{
-              var setsPresent = Math.max(1, Math.round(allItems.length / originals.length));
-              var setsNeeded = Math.ceil((track.clientWidth * 2) / setWidth) + 1;
-              for (var s = setsPresent; s < setsNeeded; s++) {{
-                originals.forEach(function (el) {{
-                  var clone = el.cloneNode(true);
-                  clone.setAttribute('aria-hidden', 'true');
-                  clone.setAttribute('tabindex', '-1');
-                  track.appendChild(clone);
-                }});
-              }}
-            }}
-          }}
-          
-          allItems = track.querySelectorAll('.q-carousel-item');
           var loopOffset = LOOP && originals.length && allItems[originals.length]
             ? allItems[originals.length].offsetLeft - originals[0].offsetLeft
             : 0;
@@ -368,10 +338,9 @@ class SliderCarousel(CarouselBase):
     ```python
     SliderCarousel(items=[Slide(...) for s in slides], interval=5000)
     ```
-    
+
     Notes:
         The `items` must have `width` set for best results.
-    
     """
 
     docs_preview_kwargs = {
