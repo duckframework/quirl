@@ -324,24 +324,49 @@ class SliderCarousel(CarouselBase):
         items (list[Component]): Slide content, one component per slide.
 
     Optional Props:
-        gap (str): CSS gap between items. Defaults to the theme's spacing token.
-        autoplay (bool): Whether to auto-advance slides. Default True.
-        interval (int): Milliseconds between auto-advances. Default 4000.
-        loop (bool): Wrap from the last slide back to the first. Default True.
-        show_dots (bool): Whether to render dot navigation. Default True.
-        show_arrows (bool): Whether to render prev/next arrow buttons. Default True.
-        pause_on_interaction (bool): Pause autoplay on pointer/wheel/touch. Default True.
-        resume_delay (int): Milliseconds of idle time before autoplay resumes. Default 3000.
-        id (str): Element id. Auto-generated if omitted.
+        gap (str):
+            CSS gap between items. Defaults to the theme's spacing token.
+        
+        autoplay (bool):
+            Whether to auto-advance slides. Default True.
+        
+        interval (int):
+            Milliseconds between auto-advances. Default 4000.
+        
+        loop (bool):
+            Wrap from the last slide back to the first. Default True.
+        
+        show_dots (bool):
+            Whether to render dot navigation. Default True.
+        
+        show_arrows (bool):
+            Whether to render prev/next arrow buttons. Default True.
+        
+        arrows_absolute (bool):
+            Absolutely position the arrows in reserved side
+            gutters, so they never overlap slide content. Default False.
+        
+        pause_on_interaction (bool):
+            Pause autoplay on pointer/wheel/touch. Default True.
+        
+        resume_delay (int):
+            Milliseconds of idle time before autoplay resumes. Default 3000.
+        
+        id (str):
+            Element id. Auto-generated if omitted.
 
     Usage:
     ```python
     SliderCarousel(items=[Slide(...) for s in slides], interval=5000)
+    SliderCarousel(items=[Slide(...) for s in slides], arrows_absolute=True)
     ```
 
     Notes:
         The `items` must have `width` set for best results.
     """
+
+    ARROW_SIZE = 32
+    ARROW_GAP = 12
 
     docs_preview_kwargs = {
         "items": [Container(text=f"Slide {i}", style={"padding": "24px", "width": "100%"}) for i in range(3)],
@@ -364,18 +389,29 @@ class SliderCarousel(CarouselBase):
         self.show_arrows = self.kwargs.get("show_arrows", True)
         self.pause_on_interaction = self.kwargs.get("pause_on_interaction", True)
         self.resume_delay = self.kwargs.get("resume_delay", 3000)
-
+        self.show_arrows = self.kwargs.get("show_arrows", True)
+        self.arrows_absolute = self.kwargs.get("arrows_absolute", True)
+        
         for item in self.items:
             item.klass = f"{item.klass or ''} q-carousel-item".strip()
             item.style.update({"flex": "0 0 100%", "scroll-snap-align": "start"})
+            
+        # Keep the track full width, absolute arrows live in the controls bar
+        absolute_arrows = self.show_arrows and self.arrows_absolute
 
         # Build track
-        track = self.build_track(self.items, extra_style={"scroll-snap-type": "x mandatory"})
+        track_style = {"scroll-snap-type": "x mandatory"}
+
+        if absolute_arrows:
+            # Fill the whole row since no arrows share it
+            track_style.update({"flex": "1 1 auto", "min-width": "0"})
+
+        track = self.build_track(self.items, extra_style=track_style)
 
         # Initialize row children with the track
         row_children = [track]
 
-        if self.show_arrows:
+        if self.show_arrows and not self.arrows_absolute:
             row_children = [self.build_arrow("prev", "‹"), track, self.build_arrow("next", "›")]
 
         children = [
@@ -386,11 +422,14 @@ class SliderCarousel(CarouselBase):
                     "align-items": "center",
                     "gap": "12px",
                 },
-                children=row_children
+                children=row_children,
             ),
         ]
 
-        if self.show_dots:
+        if absolute_arrows:
+            children.append(self.build_controls())
+        
+        elif self.show_dots:
             children.append(self.build_dots())
 
         # Initial children
@@ -408,8 +447,32 @@ class SliderCarousel(CarouselBase):
             glyph: Character rendered inside the button.
 
         Returns:
-            A Container styled as a circular arrow button.
+            A Container styled as a circular arrow button. When
+            `arrows_absolute` is set, it is pinned to the row's left/right
+            edge and vertically centered.
         """
+        style = {
+            "display": "flex",
+            "align-items": "center",
+            "justify-content": "center",
+            "width": f"{self.ARROW_SIZE}px",
+            "height": f"{self.ARROW_SIZE}px",
+            "border-radius": "999px",
+            "background": Theme.current.surface_elevated_color,
+            "color": Theme.current.text_color,
+            "cursor": "pointer",
+            "flex": "0 0 auto",
+        }
+
+        if self.arrows_absolute:
+            # Pin to the matching edge, centered on the track's height
+            style.update({
+                "position": "absolute",
+                "top": "50%",
+                "transform": "translateY(-50%)",
+                "left" if direction == "prev" else "right": "0",
+            })
+
         return Container(
             id=f"{self.id}-arrow-{direction}",
             klass=f"q-carousel-arrow q-carousel-arrow-{direction}",
@@ -419,20 +482,38 @@ class SliderCarousel(CarouselBase):
                 "tabindex": "0",
                 "aria-label": f"{direction.title()} slide",
             },
+            style=style,
+        )
+
+    def build_controls(self) -> Container:
+        """
+        Builds the bar below the track that holds dots and absolute arrows.
+
+        Returns:
+            A relatively positioned Container with the dots centered and the
+            prev/next arrows pinned to its left and right edges. Side padding
+            keeps the dots clear of the arrows.
+        """
+        gutter = self.ARROW_SIZE + self.ARROW_GAP
+        dots = [self.build_dots()] if self.show_dots else []
+
+        return Container(
+            klass="q-carousel-controls",
             style={
+                "position": "relative",
                 "display": "flex",
                 "align-items": "center",
                 "justify-content": "center",
-                "width": "32px",
-                "height": "32px",
-                "border-radius": "999px",
-                "background": Theme.current.surface_elevated_color,
-                "color": Theme.current.text_color,
-                "cursor": "pointer",
-                "flex": "0 0 auto",
+                "min-height": f"{self.ARROW_SIZE}px",
+                "padding": f"0 {gutter}px",
             },
+            children=[
+                self.build_arrow("prev", "‹"),
+                *dots,
+                self.build_arrow("next", "›"),
+            ],
         )
-
+        
     def build_script(self) -> Script:
         """
         Returns the script driving slide paging, dot/arrow navigation,
