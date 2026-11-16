@@ -98,7 +98,7 @@ class SmartImage(Container):
               update `.src` later (e.g. `document.getElementById(image_id).src = url`)
               and have the placeholder swap react live.
         
-        - lazy:
+        - lazy_load:
               If True, sets the native `loading="lazy"` attribute so the
               browser defers fetching until the image nears the viewport. Defaults
               to False (eager). Only affects the primary image, not placeholders.
@@ -139,7 +139,7 @@ class SmartImage(Container):
         self.image_id = self.kwargs.get("image_id")
         self.width = self.kwargs.get("width", self.style.get("width", None))
         self.height = self.kwargs.get("height", self.style.get("height", None))
-        self.lazy = self.kwargs.get("lazy", False)
+        self.lazy_load = self.kwargs.get("lazy_load", False)
         
         # Get placeholders
         self.unset_placeholder = (
@@ -215,7 +215,7 @@ class SmartImage(Container):
         if self.image_id:
             image_props["id"] = self.image_id
 
-        if self.lazy:
+        if self.lazy_load:
             image_props["loading"] = "lazy"
 
         image_kwargs = {
@@ -305,7 +305,7 @@ class CircularSmartImage(SmartImage):
     - image_id: Optional id applied to the underlying <img>, so calling code can
           update `.src` later (e.g. `document.getElementById(image_id).src = url`)
           and have the placeholder swap react live.
-    - lazy: If True, sets the native `loading="lazy"` attribute so the
+    - lazy_load: If True, sets the native `loading="lazy"` attribute so the
           browser defers fetching until the image nears the viewport. Defaults
           to False (eager). Only affects the primary image, not placeholders.
 
