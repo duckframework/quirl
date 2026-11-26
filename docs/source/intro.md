@@ -43,6 +43,10 @@ Once installed, you can import Quirl components and utilities directly from your
 
 This guide shows the basic setup for using Quirl in a Duck application.
 
+```{note}
+You can import components using `from quirl.components import SomeComponent` or using absolute imports (e.g. `from quirl.components.image import SmartImage`) if you need type hints or code auto-completion in IDEs.
+```
+
 ### 1. Add Quirl's Global Styles
 
 ```{important} Required: Global Styles

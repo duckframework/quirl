@@ -154,12 +154,14 @@ class SmartImage(Container):
         )
         
         # Set class
-        self.klass = "smart-image"
+        self.klass = self.klass + " smart-image" if self.klass else "smart-image"
         
         # Update style
         self.style.update({
             "position": "relative",
-            "display": "inline-block",
+            "display": "flex",
+            "align-items": "center",
+            "justify-content": "center",
             "overflow": "hidden",
             "background": Theme.current.surface_color,
         })
@@ -266,8 +268,8 @@ class SmartImage(Container):
             ]
 
         else:
-            content = [placeholder]
-
+            content = [placeholder.copy() if placeholder.parent else placeholder]
+            
         return Container(
             props={"data-role": role},
             style={
@@ -277,7 +279,7 @@ class SmartImage(Container):
                 "width": "100%",
                 "height": "100%",
             },
-            children=content,
+            children=[*content],
         )
 
 
