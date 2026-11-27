@@ -102,6 +102,12 @@ class SmartImage(Container):
               If True, sets the native `loading="lazy"` attribute so the
               browser defers fetching until the image nears the viewport. Defaults
               to False (eager). Only affects the primary image, not placeholders.
+        
+        - image_style:
+              Dictionary of image style to pass directly to img component.
+        
+        - image_props:
+              Dictionary of image props to pass directly to img component.
 
     Usage:
     ```python
@@ -140,6 +146,8 @@ class SmartImage(Container):
         self.width = self.kwargs.get("width", self.style.get("width", None))
         self.height = self.kwargs.get("height", self.style.get("height", None))
         self.lazy_load = self.kwargs.get("lazy_load", False)
+        self.image_style = self.kwargs.get("image_style", {})
+        self.image_props = self.kwargs.get("image_props", {})
         
         # Get placeholders
         self.unset_placeholder = (
@@ -156,7 +164,7 @@ class SmartImage(Container):
         # Set class
         self.klass = self.klass + " smart-image" if self.klass else "smart-image"
         
-        # Update style
+        # Update style, caller's style wins over the defaults
         self.style.update({
             "position": "relative",
             "display": "flex",
@@ -164,6 +172,7 @@ class SmartImage(Container):
             "justify-content": "center",
             "overflow": "hidden",
             "background": Theme.current.surface_color,
+            **self.style,
         })
 
         if self.width is not None:
@@ -212,6 +221,7 @@ class SmartImage(Container):
                 f"this.parentElement.querySelector('[data-role={self.ERROR_ROLE}]').style.display='flex';"
                 f"this.parentElement.querySelector('[data-role={self.UNSET_ROLE}]').style.display='none';"
             ),
+            **self.image_props,
         }
 
         if self.image_id:
@@ -227,6 +237,7 @@ class SmartImage(Container):
                 "height": "100%",
                 "object-fit": self.fit,
                 "display": "block" if self.source else "none",
+                **self.image_style,
             },
             "props": image_props,
         }
@@ -293,23 +304,47 @@ class CircularSmartImage(SmartImage):
     - (none — src is optional; placeholder covers the unset case)
 
     Optional Props:
-    - source: Image source URL. If omitted, the placeholder shows immediately.
-    - placeholder: Fallback (URL string or component) for both unset src
-      and network error, unless overridden below. If neither this nor
-      unset_placeholder/error_placeholder is given, a plain
-      SmartImagePlaceholder is used instead of showing nothing.
-    - unset_placeholder: Shown when src is empty/None. Overrides placeholder.
-    - error_placeholder: Shown when the image fails to load. Overrides placeholder.
-    - alt: Alt text for the image.
-    - fit: object-fit value, defaults to cover.
-    - height: Container height (CSS value).
-    - width: Container width (CSS value).
-    - image_id: Optional id applied to the underlying <img>, so calling code can
+    - source:
+         Image source URL. If omitted, the placeholder shows immediately.
+         
+    - placeholder:
+         Fallback (URL string or component) for both unset src
+         and network error, unless overridden below. If neither this nor
+         unset_placeholder/error_placeholder is given, a plain
+         SmartImagePlaceholder is used instead of showing nothing.
+         
+    - unset_placeholder: 
+         Shown when src is empty/None. Overrides placeholder.
+         
+    - error_placeholder: 
+         Shown when the image fails to load. Overrides placeholder.
+         
+    - alt: 
+         Alt text for the image.
+         
+    - fit: 
+         object-fit value, defaults to cover.
+         
+    - height:
+         Container height (CSS value).
+         
+    - width:
+          Container width (CSS value).
+          
+    - image_id:
+          Optional id applied to the underlying <img>, so calling code can
           update `.src` later (e.g. `document.getElementById(image_id).src = url`)
           and have the placeholder swap react live.
+          
     - lazy_load: If True, sets the native `loading="lazy"` attribute so the
           browser defers fetching until the image nears the viewport. Defaults
           to False (eager). Only affects the primary image, not placeholders.
+          
+    - image_style:
+          Dictionary of image style to pass directly to img component.
+        
+    - image_props:
+          Dictionary of image props to pass directly to img component.
 
     Usage:
     ```python
